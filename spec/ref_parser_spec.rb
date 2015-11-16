@@ -10,9 +10,9 @@ describe AuRec do
   end
 
   it 'knows if has refs' do
-    expect(rec.has_refs?).to be_falsey
+    expect(rec.refs_to?).to be_falsey
     rec.refs_to << 'a'
-    expect(rec.has_refs?).to be_truthy
+    expect(rec.refs_to?).to be_truthy
   end
 
   it 'refs_to is a mutable array' do
@@ -59,6 +59,10 @@ describe JsonDb do
     rec = parser.find_by_id('oid2')
     expect(rec.refs_to).to match_array ['oid1', 'oid4']
     expect(rec.refs_from).to match_array ['oid3']
+    parser.from_references.each do |r|
+      p r
+      print "\n"
+    end
   end
 
 

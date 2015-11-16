@@ -1,4 +1,17 @@
 require 'json'
+class DataSplitter
+  class << self
+    def split( json_data )
+      recs = {}
+      json_data.split("\n").each do |entry|
+        j = JSON.parse(entry)
+        rec = AuRec.new(j['id'], j['old_id'], j['refs'])
+        recs[j['old_id']] = rec 
+      end
+      recs
+    end
+  end
+end
 class AuRec
   attr_accessor :id, :old_id, :refs_to, :refs_from
   def initialize(id, old_id, refs)
@@ -7,8 +20,11 @@ class AuRec
     @refs_to = refs 
     @refs_from = []
   end
-  def has_refs?
+  def refs_to?
     !@refs_to.empty?
+  end
+  def refs_from?
+    !@refs_from.empty?
   end
 end
 
@@ -24,14 +40,9 @@ class JsonDb
     end
   end
   def initialize( json_data )
-    @records = {}
-    json_data.split("\n").each do |entry|
-      j = JSON.parse(entry)
-      rec = AuRec.new(j['id'], j['old_id'], j['refs'])
-      @records[j['old_id']] = rec 
-    end
-    build_internal_links unless @records.empty?
+    @records = DataSplitter.split( json_data ) 
     JsonDb.count = @records.length
+    build_internal_links unless @records.empty?
   end
 
   def each(&block)
@@ -41,9 +52,11 @@ class JsonDb
   def find_by_id( value  )
     @records[value.to_s]
   end
-
-  def references(&block)
-    actual_records.select{|i| i.has_refs?}.each(&block)
+  
+  %w(to from).each do |x|
+    define_method "#{x}_references" do |&b|
+      actual_records.select{|i| i.method("refs_#{x}?".to_sym).call }.each(&b)
+    end
   end
 
   private
@@ -52,7 +65,7 @@ class JsonDb
   end
 
   def build_internal_links
-    references do |ref|
+    to_references do |ref|
       ref.refs_to.each do |ref_id|
         rec = find_by_id( ref_id ) 
         rec.refs_from << ref.old_id if rec
