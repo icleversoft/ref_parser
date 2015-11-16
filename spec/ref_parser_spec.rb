@@ -59,10 +59,6 @@ describe JsonDb do
     rec = parser.find_by_id('oid2')
     expect(rec.refs_to).to match_array ['oid1', 'oid4']
     expect(rec.refs_from).to match_array ['oid3']
-    parser.from_references.each do |r|
-      p r
-      print "\n"
-    end
   end
 
 
