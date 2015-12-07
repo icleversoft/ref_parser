@@ -108,7 +108,6 @@ describe JsonDb do
 			it "knows the tag identifiers" do
 				expect(rec_refs.tags.keys).to eq ['300', '400']
 			end
-
 			it 'returns the record ids for each tag identifier' do
 				expect(rec_refs.tags['300']).to eq ['3234']
 				expect(rec_refs.tags['400']).to eq ['4234', '4235']
