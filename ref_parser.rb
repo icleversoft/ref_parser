@@ -44,12 +44,12 @@ class BibRec < Rec
 	attr_accessor :tags
 	def initialize(id, old_id, refs = {})
 		super( id, old_id )
-		@tags = {}
+		@tags = Hash.new([])
 		build_tags( refs )
 	end
 	private
 	def build_tags( refs )
-		refs.each(&set_tag)
+		refs.each(&set_tag) unless refs.empty?
 	end
 	def set_tag
 		->(tag, values){@tags[tag] = values.collect(&record_identifiers)}
