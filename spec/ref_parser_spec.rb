@@ -75,6 +75,23 @@ describe JsonDb do
 			expect(rec.refs_from).to match_array ['oid3']
 			expect{|b| parser.from_references(&b)}.to yield_control.exactly(3).times
 		end
+
+		context '#find' do
+
+			it "returns an array" do
+				expect(parser.find(1)).to be_an Array
+			end
+			it "can take one identifier as argument" do
+				rec = parser.find_by_id('oid1')
+				expect(parser.find('oid1')).to eq [rec]
+			end
+
+			it "can take many identifiers as argument" do
+				rec1 = parser.find_by_id( 'oid1' )
+				rec2 = parser.find_by_id( 'oid4' )
+        expect(parser.find('oid1', 'oid4')).to match_array [rec1, rec2]
+			end
+		end
 	end
 
 	context 'bibrec' do
@@ -86,34 +103,35 @@ describe JsonDb do
 		end
 
 		it "returns nil when a record can't be found" do
-      rec = parser.find_by_id('kaka')
+			rec = parser.find_by_id('kaka')
 			expect(rec).to be_nil
 		end
 
 		it "finds returns a record by when searching by its id" do
-     rec = parser.find_by_id("oid1")
-		 expect(rec).to be_an BibRec
+			rec = parser.find_by_id("oid1")
+			expect(rec).to be_an BibRec
+		end
+	end
+
+	context 'references' do
+		let(:parser){JsonDb.build(bib_sample)}
+		let(:rec_refs){parser.find_by_id('oid3')}
+
+		it "detects the references" do
+			expect(rec_refs.tags.empty?).to be_falsey
+		end
+		it "knows the right tags count" do
+			expect(rec_refs.tags.length).to eq 2
 		end
 
-		context 'references' do
-		  let(:rec_refs){parser.find_by_id('oid3')}
-
-			it "detects the references" do
-				expect(rec_refs.tags.empty?).to be_falsey
-			end
-			it "knows the right tags count" do
-				expect(rec_refs.tags.length).to eq 2
-			end
-
-			it "knows the tag identifiers" do
-				expect(rec_refs.tags.keys).to eq ['300', '400']
-			end
-			it 'returns the record ids for each tag identifier' do
-				expect(rec_refs.tags['300']).to eq ['3234']
-				expect(rec_refs.tags['400']).to eq ['4234', '4235']
-			end
-
+		it "knows the tag identifiers" do
+			expect(rec_refs.tags.keys).to eq ['300', '400']
 		end
+		it 'returns the record ids for each tag identifier' do
+			expect(rec_refs.tags['300']).to eq ['3234']
+			expect(rec_refs.tags['400']).to eq ['4234', '4235']
+		end
+
 	end
 
 end

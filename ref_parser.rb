@@ -83,6 +83,10 @@ class JsonDb
 		@records.each_value(&block)
 	end
 
+	def find( *ids )
+		find_with_array(ids.flatten)
+	end
+
 	def find_by_id( value  )
 		@records[value.to_s]
 	end
@@ -95,6 +99,11 @@ class JsonDb
 	end
 
 	private
+	def find_with_array( ids )
+		@records.values.select{|i| ids.include? i.old_id}
+
+	end
+
 	def has_authorities?
 		@records.values.first.is_a? AuRec
 	end
