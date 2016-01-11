@@ -1,4 +1,6 @@
 require 'json'
+require 'active_support/core_ext/hash/indifferent_access'
+
 class DataSplitter
 	class << self
 		def split( json_data )
@@ -6,9 +8,9 @@ class DataSplitter
 			json_data.split("\n").each do |entry|
 				j = JSON.parse(entry)
 				if j['refs'].is_a? Array
-					rec = AuRec.new(j['id'], j['old_id'], j['refs'])
+					rec = AuRec.new({'id': j['id'], 'old_id': j['old_id'], 'refs': j['refs']})
 				else
-					rec = BibRec.new(j['id'], j['old_id'], j['refs'])
+					rec = BibRec.new({'id': j['id'], 'old_id': j['old_id'], 'refs': j['refs']})
 				end
 				recs[j['old_id']] = rec
 			end
@@ -19,22 +21,25 @@ end
 
 class Rec
 	attr_accessor :id, :old_id
-	def initialize(id, old_id)
-		@id = id.to_s
-		@old_id = old_id.to_s
+	def initialize( options = {})
+		@id = options[:id].to_s || ''
+		@old_id = options[:old_id].to_s || ''
 	end
 end
 
 class AuRec < Rec
-	attr_accessor :refs_to, :refs_from
-	def initialize(id, old_id, refs = [] )
-		super( id, old_id )
-		@refs_to = refs
+	attr_accessor :refs_to, :refs_from, :indicators
+	def initialize(options = {} )
+		super( options )
+		@refs_to = options[:refs] || []
+		@indicators = options[:inds] || []
 		@refs_from = []
 	end
+
 	def refs_to?
 		!@refs_to.empty?
 	end
+
 	def refs_from?
 		!@refs_from.empty?
 	end
@@ -42,21 +47,30 @@ end
 
 class BibRec < Rec
 	attr_accessor :tags
-	def initialize(id, old_id, refs = {})
-		super( id, old_id )
-		@tags = Hash.new([])
-		build_tags( refs )
+	def initialize(options = {})
+		super( options )
+		@tags = {}
+		refs = options[:refs] || {}
+		build_tags( ActiveSupport::HashWithIndifferentAccess.new(refs) )
 	end
 	private
 	def build_tags( refs )
 		refs.each(&set_tag) unless refs.empty?
 	end
 	def set_tag
-		->(tag, values){@tags[tag] = values.collect(&record_identifiers)}
+		if RUBY_VERSION.to_i >= 2
+			->(tag, values){@tags[tag] = values.collect(&record_identifiers)}
+		else
+			Proc.new{|tag, values| @tags[tag] = values.collect(&record_identifiers)}
+		end
 	end
 
 	def record_identifiers
-		->(rec){rec['id']}
+		if RUBY_VERSION.to_i >= 2
+			->(rec){rec['id']}
+		else
+			Proc.new{|rec| rec['id']}
+		end
 	end
 end
 
