@@ -25,7 +25,7 @@ describe BibRec do
 	end
 
 	context '#tags' do
-		let(:rec1){ BibRec.new( {"id": "2", "old_id":"a", "refs":{"200":[{"id":"x", "title":"yyy"}]}} ) }
+		let(:rec1){ BibRec.new( {"id": "2", "old_id":"a", "refs":{"200":[{"id":"x", "title":"yyy"}]}, "file": "/path/to/file"} ) }
 
 		it 'is a Hash' do
 			expect(rec.tags).to be_an Hash
@@ -41,6 +41,10 @@ describe BibRec do
 
 		it 'holds the right values' do
 			expect(rec1.tags['200']).to match_array ['x']
+		end
+
+		it 'reads file property' do
+			expect(rec1.file).to eq '/path/to/file'
 		end
 
 	end
@@ -79,26 +83,10 @@ describe AuRec do
 		expect(rec.refs_from).not_to be_empty
 	end
 
-	context 'indicators' do
-		it 'has not any indicator' do
-			expect(rec.indicators).to eq []
-		end
-
-		it 'both indicators are empty' do
-			rec = AuRec.new('id':'1', 'old_id':'a', 'inds':[' ', ' '], 'refs': [])
-			expect(rec.indicators).to eq [' ', ' ']
-		end
-
-		it 'first indicator has a value, the second is empty' do
-			rec = AuRec.new('id':'1', 'old_id':'a', 'inds':['1', ' '], 'refs': [])
-			expect(rec.indicators).to eq ['1', ' ']
-		end
-
-		it 'both first and second indicator have a value' do
-			rec = AuRec.new('id':'1', 'old_id':'a', 'inds':['1', '2'], 'refs': [])
-			expect(rec.indicators).to eq ['1', '2']
-		end
+	it 'reads file property' do
+			expect(rec.file).to eq ''
 	end
+
 end
 
 describe JsonDb do

@@ -1,4 +1,4 @@
 {"id": "1", "old_id": "oid1", "inds": ["1", " "], "refs":["oid4"]}
-{"id": "2", "old_id": "oid2", "inds": [" ", " "], "refs":["oid1", "oid4"]}
+{"id": "2", "old_id": "oid2", "inds": [" ", " "], "refs":["oid1", "oid4"], "file": "/path/to/file"}
 {"id": "3", "old_id": "oid3", "inds": [" ", "1"], "refs":["oid2"]}
 {"id": "4", "old_id": "oid4", "inds": ["1", "1"], "refs":[]}

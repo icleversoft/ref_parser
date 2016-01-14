@@ -1,3 +1,3 @@
 {"id": "1", "old_id": "oid1",  "refs":{"100":[{"id": "1234", "title": "title1"}]}}
-{"id": "2", "old_id": "oid2",  "refs":{"200":[{"id": "2234", "title": "title1"}, {"id": "2235", "title": "title2"}]}}
+{"id": "2", "old_id": "oid2",  "refs":{"200":[{"id": "2234", "title": "title1"}, {"id": "2235", "title": "title2"}]}, "file": "/path/to/file"}
 {"id": "3", "old_id": "oid3",  "refs":{"300":[{"id": "3234", "title": "title1"}], "400":[{"id": "4234", "title": "title1"}, {"id": "4235", "title":"title"}]}}

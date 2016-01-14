@@ -8,9 +8,9 @@ class DataSplitter
 			json_data.split("\n").each do |entry|
 				j = JSON.parse(entry)
 				if j['refs'].is_a? Array
-					rec = AuRec.new({'id': j['id'], 'old_id': j['old_id'], 'refs': j['refs']})
+					rec = AuRec.new({'id': j['id'], 'old_id': j['old_id'], 'refs': j['refs'], 'file': j['file']})
 				else
-					rec = BibRec.new({'id': j['id'], 'old_id': j['old_id'], 'refs': j['refs']})
+					rec = BibRec.new({'id': j['id'], 'old_id': j['old_id'], 'refs': j['refs'], 'file': j['file']})
 				end
 				recs[j['old_id']] = rec
 			end
@@ -20,19 +20,19 @@ class DataSplitter
 end
 
 class Rec
-	attr_accessor :id, :old_id
+	attr_accessor :id, :old_id, :file
 	def initialize( options = {})
 		@id = options[:id].to_s || ''
 		@old_id = options[:old_id].to_s || ''
+		@file = options[:file] || ''
 	end
 end
 
 class AuRec < Rec
-	attr_accessor :refs_to, :refs_from, :indicators
+	attr_accessor :refs_to, :refs_from
 	def initialize(options = {} )
 		super( options )
 		@refs_to = options[:refs] || []
-		@indicators = options[:inds] || []
 		@refs_from = []
 	end
 
